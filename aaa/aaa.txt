@@ -1,1 +1,57 @@
+namespace test
+{
+    public static class RichTextBoxBinder
+    {
+        private const string _XAML_BEGIN = @"<Section xml:space=""preserve"" HasTrailingParagraphBreakOnPaste=""False"" xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""><Paragraph>";
+        private const string _XAML_END = @"</Paragraph></Section>";
+
+        #region InlinesXaml ----------------------------------------------------
+
+        #region RichTextBox attached properties
+
+        public static readonly DependencyProperty InlinesXamlProperty =
+          DependencyProperty.RegisterAttached(
+            "InlinesXaml",
+            typeof(string),
+            typeof(RichTextBox),
+            new PropertyMetadata(OnInlinesXamlPropertyChanged));
+
+        private static void OnInlinesXamlPropertyChanged(
+          DependencyObject d,
+          DependencyPropertyChangedEventArgs e)
+        {
+            var rtb = d as RichTextBox;
+            if (rtb == null) throw new ArgumentException(
+              "Expected a dependency object of type RichTextBox.", "d");
+
+            string xaml = null;
+            if (e.NewValue != null)
+            {
+                xaml = e.NewValue as string;
+                if (xaml == null) throw new ArgumentException("Expected a value of type string.", "e.NewValue");
+            }
+
+            // Set the xaml and reset selection 
+            //rtb.Xaml = xaml ?? string.Empty;
+            rtb.Xaml = (xaml == null) ? string.Empty : _XAML_BEGIN + xaml + _XAML_END;
+            rtb.Selection.Select(rtb.ContentStart, rtb.ContentStart);
+        }
+
+        #endregion
+
+        public static void SetInlinesXaml(this RichTextBox rtb, string xaml)
+        {
+            rtb.SetValue(InlinesXamlProperty, xaml);
+        }
+
+        public static string GetInlinesXaml(this RichTextBox rtb)
+        {
+            return (string)rtb.GetValue(InlinesXamlProperty);
+        }
+
+        #endregion InlinesXaml -------------------------------------------------
+    } 
+
+}
+
 test
